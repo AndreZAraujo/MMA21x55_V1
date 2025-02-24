@@ -1,0 +1,49 @@
+Parâmetro
+  MediaRapida(21);
+  MediaLenta(55);
+  PontosStopGainParcial(1000);
+  PontosStopLoss(500);
+  QuantidadeStopParcialGain(5);
+var                      
+  sMedRapida      :  Real;
+  sMedLenta       :  Real;
+  sPrevMedRapida  :  Real;
+  sPrevMedLenta   :  Real;
+
+begin
+  sMedRapida      := Media(MediaRapida, Fechamento);
+  sMedLenta       := Media(MediaLenta, Fechamento);
+  sPrevMedRapida  := sMedRapida[1];
+  sPrevMedLenta   := sMedLenta[1];    
+ 
+  se (sPrevMedRapida < sPrevMedLenta) e (sMedRapida > sMedLenta) então
+    inicio
+      Se(isSold = true) então
+        BuyToCoverLimit(sMedLenta);
+      BuyLimit(sMedLenta);
+      SellToCoverStop(sMedLenta-PontosStopLoss);
+      SellToCoverLimit(sMedLenta+PontosStopGainParcial,QuantidadeStopParcialGain);
+    fim
+  senão se (sPrevMedRapida > sPrevMedLenta) e (sMedRapida < sMedLenta) então 
+    inicio
+      Se (IsBought = true) então
+        SellToCoverLimit(sMedLenta);
+      SellShortLimit(sMedLenta);
+      buyToCoverStop(sMedLenta+PontosStopLoss);
+      BuyToCoverLimit(sMedLenta-PontosStopGainParcial,QuantidadeStopParcialGain);
+    fim;
+
+                    
+
+// medias e coloracao
+Plot(sMedRapida);
+Plot2(sMedLenta);
+
+  se  (sMedRapida > sMedLenta)  então
+  paintBar(clGreen);
+
+  se  (sMedRapida < sMedLenta)  então
+  paintBar(clRed);
+
+
+End;
